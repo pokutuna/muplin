@@ -1,4 +1,45 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
 require 'rubygems'
 require 'muplin'
+
+
+Version = Muplin::VERSION
+DEFAULT_OUTPUT = 'muplined.pdf'
+
+
+def usage
+  <<"EOS"
+Muplin is a MUriyari Pdf outLINer. https://github.com/pokutuna/muplin
+Usage: muplin <source.pdf> <outline(.yaml|.json)> [options]
+EOS
+end
+
+def load_outline(file)
+  ext = File.extname(file)
+  if ext == '.yaml'
+    require 'yaml'
+    YAML.load_file(file)
+  elsif ext == '.json'
+    require 'json'
+    JSON.parse(File.open(file).read)
+  else
+    puts usage
+    raise 'outline must be yaml or json'
+  end
+end
+
+
+OPTS = {}
+OptionParser.new(usage) { |opt|
+  opt.on('-o', '--output=FILE', "write pdf to FILE. default: ./#{DEFAULT_OUTPUT}") { |v| OPTS[:o] = v}
+  opt.on('--overwrite', 'overwrite to <source.pdf>') { |v| OPTS[:overwrite] = v}
+  opt.parse!(ARGV)
+}
+
+puts usage if ARGV.size < 2
+src_file, outline_file = ARGV
+
+OPTS[:o] = src_file if OPTS[:overwrite]
+Muplin.exec(src_file, load_outline(outline_file), OPTS[:o] || DEFAULT_OUTPUT)
