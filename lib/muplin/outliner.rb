@@ -13,11 +13,9 @@ class Muplin::Outliner
   def define_outline(outlines, parent = nil)
     outlines.each do |item|
       if a_section?(item)
-        puts "add section #{item.inspect}, #{parent.inspect}"
         add_section(item, parent)
         @last_label = item['label']
       elsif sections?(item)
-        puts "subsections #{item.inspect}, #{parent.inspect}"
         define_outline(item, @last_label)
       else
         raise ArgumentError
