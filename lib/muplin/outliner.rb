@@ -18,7 +18,7 @@ class Muplin::Outliner
       elsif sections?(item)
         define_outline(item, @last_label)
       else
-        raise ArgumentError
+        raise ArgumentError, item.inspect
       end
     end
   end
